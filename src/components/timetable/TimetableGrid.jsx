@@ -28,34 +28,63 @@ export default function TimetableGrid({
         </thead>
 
         <tbody>
-          {DAYS.map((day) => (
-            <tr key={day}>
-              <td className="day-cell">{day}</td>
+          {DAYS.map((day) => {
+            let skipNextPeriod = false;
 
-              {PERIODS.map((period) => {
-                if (period === 'recess') {
+            return (
+              <tr key={day}>
+                <td className="day-cell">{day}</td>
+
+                {PERIODS.map((period, index) => {
+                  if (skipNextPeriod) {
+                    skipNextPeriod = false;
+                    return null;
+                  }
+
+                  if (period === 'recess') {
+                    return (
+                      <td key={period} className="recess-col">
+                        LUNCH RECESS
+                      </td>
+                    );
+                  }
+
+                  const slot = schedule[day]?.[period];
+
+                  const isLab =
+                    slot &&
+                    (slot.isLab ||
+                      String(slot.type || '').toLowerCase() === 'lab');
+
+                  const nextPeriod = PERIODS[index + 1];
+
+                  const spansTwoPeriods =
+                    isLab &&
+                    Number(slot.duration) === 2 &&
+                    typeof nextPeriod === 'number' &&
+                    nextPeriod === period + 1;
+
+                  if (spansTwoPeriods) {
+                    skipNextPeriod = true;
+                  }
+
                   return (
-                    <td key={period} className="recess-col">
-                      LUNCH RECESS
+                    <td
+                      key={period}
+                      colSpan={spansTwoPeriods ? 2 : undefined}
+                    >
+                      {slot ? (
+                        <LectureCard
+                          slot={slot}
+                          onClick={onSlotClick}
+                        />
+                      ) : null}
                     </td>
                   );
-                }
-
-                const slot = schedule[day]?.[period];
-
-                return (
-                  <td key={period}>
-                    {slot ? (
-                      <LectureCard
-                        slot={slot}
-                        onClick={onSlotClick}
-                      />
-                    ) : null}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
