@@ -3,27 +3,31 @@ import React, { createContext, useContext, useState } from 'react';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  // Checks if user was already logged in previously
+  // Retrieves saved user session from localStorage
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('classoptima_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('co_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
   });
 
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem('classoptima_user', JSON.stringify(userData));
+    localStorage.setItem('co_user', JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('classoptima_user');
+    localStorage.removeItem('co_user');
   };
 
   const switchRole = (newRole) => {
     if (!user) return;
     const updated = { ...user, role: newRole };
     setUser(updated);
-    localStorage.setItem('classoptima_user', JSON.stringify(updated));
+    localStorage.setItem('co_user', JSON.stringify(updated));
   };
 
   return (
