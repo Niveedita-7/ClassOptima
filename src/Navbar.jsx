@@ -1,5 +1,5 @@
 import React from 'react';
-import "./styles/navbar.css";
+import './styles/navbar.css';
 
 export default function Navbar({ user, onLogout, onSwitchRole }) {
   // Generates avatar initials (e.g. "Dr. Amit Sharma" -> "AS", "Admin Officer" -> "AO")
